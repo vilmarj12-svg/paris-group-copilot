@@ -3,6 +3,18 @@
 Copiloto de venture studio para discovery e execução de MVPs com IA.
 
 📄 **Enquadramento do produto:** [`docs/enquadramento.md`](docs/enquadramento.md) — contexto, dor do usuário, hipótese de valor e métrica de validação.
+🏗️ **Arquitetura da stack:** [`docs/arquitetura.md`](docs/arquitetura.md) — justificativa de Next.js + FastAPI + PostgreSQL + Redis em contexto de venture studio.
+
+## Rodando a stack local
+
+```bash
+cp .env.example .env        # backend + infra
+docker compose up --build   # sobe Postgres + Redis + API FastAPI
+# API + contrato OpenAPI: http://localhost:8000/docs
+
+# frontend (em outro terminal):
+npm install && npm run dev  # http://localhost:3000
+```
 
 ---
 

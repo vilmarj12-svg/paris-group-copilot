@@ -1,0 +1,39 @@
+# Stack local reutilizável do studio: Postgres + Redis + API FastAPI.
+# `docker compose up --build` sobe tudo; o FastAPI fica em http://localhost:8000/docs
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: copilot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-copilot}
+      POSTGRES_DB: copilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copilot -d copilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    # Sem mapeamento de porta para o host: a API acessa via rede interna
+    # do Compose (redis:6379). Evita conflito com um Redis já rodando na máquina.
+    expose:
+      - "6379"
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql+psycopg2://copilot:${POSTGRES_PASSWORD:-copilot}@db:5432/copilot
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
